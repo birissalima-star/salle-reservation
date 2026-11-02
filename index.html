@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>حجز قاعة الحفلات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Amiri:wght@700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   الألوان
+   ========================================================= */
+:root{
+  --bg:#FBF7F1; --card:#FFFFFF; --ink:#2B2320; --muted:#7A6E66;
+  --gold:#B8893B; --gold-soft:#F3E7D1; --line:#EADFCF;
+  --free:#E8F4EC; --free-ink:#2F7A4B;
+  --busy:#F7E3E1; --busy-ink:#A8443B;
+  --sel:#B8893B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--ink);line-height:1.7}
+a{color:inherit}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+
+/* الواجهة */
+.hero{background:linear-gradient(160deg,#2B2320 0%,#4A3A2E 100%);color:#fff;padding:56px 0 72px;text-align:center}
+.hero small{letter-spacing:2px;color:var(--gold);font-weight:700}
+.hero h1{font-family:'Amiri',serif;font-size:clamp(34px,7vw,56px);margin:6px 0 10px}
+.hero p{color:#E9DFD3;max-width:560px;margin:0 auto}
+.hero .btn{margin-top:22px}
+.btn{display:inline-block;background:var(--gold);color:#fff;border:none;padding:13px 28px;border-radius:999px;font:700 16px 'Tajawal';cursor:pointer;text-decoration:none}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;border:1.5px solid var(--gold);color:var(--gold)}
+
+/* البطاقات */
+section{margin-top:-36px;margin-bottom:56px}
+section+section{margin-top:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px}
+h2{font-size:24px;margin-bottom:16px}
+h2 span{color:var(--gold)}
+
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.fact{background:var(--gold-soft);border-radius:14px;padding:14px;text-align:center}
+.fact b{display:block;font-size:22px}
+.fact small{color:var(--muted)}
+.services{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.services span{border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:14px}
+
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.gallery img,.gallery .ph{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px}
+.gallery .ph{background:repeating-linear-gradient(45deg,var(--gold-soft),var(--gold-soft) 12px,#EFE0C4 12px,#EFE0C4 24px);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px}
+
+/* الرزنامة */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-head button{background:var(--gold-soft);border:none;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer}
+.cal-head h3{font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dow{text-align:center;font-size:13px;color:var(--muted);padding:4px 0}
+.day{aspect-ratio:1;border-radius:12px;border:none;font:500 16px 'Tajawal';display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--free);color:var(--free-ink)}
+.day small{font-size:10px;line-height:1}
+.day.busy{background:var(--busy);color:var(--busy-ink);cursor:not-allowed;text-decoration:line-through}
+.day.half{background:linear-gradient(135deg,var(--free) 50%,var(--busy) 50%);color:var(--ink)}
+.day.past{background:transparent;color:#C9BFB6;cursor:not-allowed}
+.day.empty{background:transparent;cursor:default}
+.day.sel{outline:3px solid var(--sel);outline-offset:1px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:14px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:middle;margin-left:6px}
+
+/* الاستمارة */
+form{display:grid;gap:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{font-weight:500;font-size:15px}
+input,select,textarea{width:100%;margin-top:4px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;font:16px 'Tajawal';background:#FFFDF9}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--gold);border-color:transparent}
+.picked{background:var(--gold-soft);border-radius:12px;padding:12px 14px;font-weight:700}
+.note{background:#FFF8EA;border-right:4px solid var(--gold);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--muted)}
+.err{color:var(--busy-ink);font-size:14px;min-height:20px}
+
+footer{text-align:center;color:var(--muted);font-size:14px;padding:30px 0 50px}
+@media (max-width:560px){.row{grid-template-columns:1fr}.card{padding:18px}.day{border-radius:9px;font-size:14px}}
+</style>
+</head>
+<body>
+
+<script>
+/* =========================================================
+   ⚙️ معلومات القاعة — بدّلي هنا فقط
+   ========================================================= */
+const SALLE = {
+  name: "قاعة الياسمين",
+  city: "وهران",
+  address: "حي السلام، وهران",
+  description: "قاعة راقية لحفلات الأعراس والخطوبة والمناسبات العائلية، بخدمة كاملة وتنظيم مريح.",
+  capacity: 400,                 // عدد المدعوين
+  priceLunch: 120000,            // سعر الغداء بالدينار
+  priceDinner: 150000,           // سعر العشاء بالدينار
+  deposit: 30000,                // العربون بالدينار
+  whatsapp: "213600000000",      // رقم المسؤول (بلا 0 في البداية، مع 213)
+  services: ["مكيّفة", "موقف سيارات", "مطبخ مجهّز", "قاعة للنساء", "إضاءة وصوت", "طاولات وكراسي"],
+  photos: [],                    // روابط الصور، مثلاً: ["photo1.jpg", "photo2.jpg"]
+
+  // التواريخ المحجوزة: "السنة-الشهر-اليوم": "lunch" أو "dinner" أو "full"
+  booked: {
+    "2026-11-07": "full",
+    "2026-11-14": "dinner",
+    "2026-11-21": "full",
+    "2026-11-28": "lunch",
+    "2026-12-05": "full",
+    "2026-12-12": "full",
+    "2026-12-19": "dinner",
+  }
+};
+</script>
+
+<header class="hero">
+  <div class="wrap">
+    <small id="h-city"></small>
+    <h1 id="h-name"></h1>
+    <p id="h-desc"></p>
+    <a href="#booking" class="btn">شوف التواريخ الفارغة</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <div class="card">
+      <h2>معلومات <span>القاعة</span></h2>
+      <div class="facts" id="facts"></div>
+      <div class="services" id="services"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <h2>صور <span>القاعة</span></h2>
+      <div class="gallery" id="gallery"></div>
+    </div>
+  </section>
+
+  <section id="booking">
+    <div class="card">
+      <h2>اختاري <span>التاريخ</span></h2>
+      <div class="cal-head">
+        <button id="prev" aria-label="الشهر اللي فات">›</button>
+        <h3 id="month"></h3>
+        <button id="next" aria-label="الشهر الجاي">‹</button>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="legend">
+        <span><i style="background:var(--free)"></i>فارغ</span>
+        <span><i style="background:linear-gradient(135deg,var(--free) 50%,var(--busy) 50%)"></i>محجوز نص النهار</span>
+        <span><i style="background:var(--busy)"></i>محجوز</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <h2>طلب <span>الحجز</span></h2>
+      <form id="form" novalidate>
+        <div class="picked" id="picked">ما اخترتيش التاريخ بعد ☝️</div>
+        <div class="row">
+          <label>الوقت
+            <select id="period"></select>
+          </label>
+          <label>نوع المناسبة
+            <select id="type">
+              <option>عرس</option><option>خطوبة</option><option>عقيقة</option>
+              <option>نجاح / تخرج</option><option>أخرى</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label>الاسم واللقب
+            <input id="name" autocomplete="name" maxlength="60">
+          </label>
+          <label>رقم الهاتف
+            <input id="phone" type="tel" inputmode="numeric" placeholder="05 / 06 / 07 ..." maxlength="10">
+          </label>
+        </div>
+        <label>عدد المدعوين تقريباً
+          <input id="guests" type="number" min="1">
+        </label>
+        <label>ملاحظات (اختياري)
+          <textarea id="notes" rows="3" maxlength="300"></textarea>
+        </label>
+        <div class="note" id="deposit-note"></div>
+        <div class="err" id="err"></div>
+        <button class="btn" id="send" type="submit" disabled>ابعث الطلب على واتساب</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer id="foot"></footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const dz = n => n.toLocaleString("fr-DZ").replace(/ | /g, " ") + " دج";
+const MONTHS = ["جانفي","فيفري","مارس","أفريل","ماي","جوان","جويلية","أوت","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+const DOW = ["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const PERIODS = { lunch: "الغداء", dinner: "العشاء", full: "النهار كامل" };
+
+/* المعلومات */
+$("h-city").textContent = SALLE.city;
+$("h-name").textContent = SALLE.name;
+$("h-desc").textContent = SALLE.description;
+document.title = SALLE.name + " — حجز";
+$("facts").innerHTML = [
+  [SALLE.capacity, "مدعو"],
+  [dz(SALLE.priceLunch), "الغداء"],
+  [dz(SALLE.priceDinner), "العشاء"],
+  [dz(SALLE.deposit), "العربون"],
+].map(([b, s]) => `<div class="fact"><b>${b}</b><small>${s}</small></div>`).join("");
+SALLE.services.forEach(s => { const e = document.createElement("span"); e.textContent = s; $("services").append(e); });
+if (SALLE.photos.length) {
+  SALLE.photos.forEach(src => { const i = document.createElement("img"); i.src = src; i.alt = SALLE.name; i.loading = "lazy"; $("gallery").append(i); });
+} else {
+  $("gallery").innerHTML = '<div class="ph">صورة القاعة</div>'.repeat(3);
+}
+$("deposit-note").innerHTML = `💡 الحجز ما يتأكدش حتى يتخلص العربون (<b>${dz(SALLE.deposit)}</b>). المسؤول يتصل بيك باش يأكد التاريخ ويشرحلك كيفاش تخلصي.`;
+$("foot").textContent = `${SALLE.name} · ${SALLE.address}`;
+
+/* الرزنامة */
+const today = new Date(); today.setHours(0,0,0,0);
+let view = new Date(today.getFullYear(), today.getMonth(), 1);
+let picked = null;
+const key = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+function draw() {
+  $("month").textContent = `${MONTHS[view.getMonth()]} ${view.getFullYear()}`;
+  $("prev").disabled = view <= new Date(today.getFullYear(), today.getMonth(), 1);
+  const g = $("grid"); g.innerHTML = DOW.map(d => `<div class="dow">${d.replace("ال", "").slice(0,3)}</div>`).join("");
+  const first = view.getDay(), days = new Date(view.getFullYear(), view.getMonth()+1, 0).getDate();
+  for (let i = 0; i < first; i++) g.insertAdjacentHTML("beforeend", '<div class="day empty"></div>');
+  for (let n = 1; n <= days; n++) {
+    const d = new Date(view.getFullYear(), view.getMonth(), n), k = key(d), b = SALLE.booked[k];
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "day";
+    btn.innerHTML = n;
+    if (d < today) { btn.classList.add("past"); btn.disabled = true; }
+    else if (b === "full") { btn.classList.add("busy"); btn.disabled = true; }
+    else {
+      if (b) { btn.classList.add("half"); btn.innerHTML += `<small>${b === "lunch" ? "العشاء فارغ" : "الغداء فارغ"}</small>`; }
+      btn.onclick = () => pick(d);
+    }
+    if (picked && key(picked) === k) btn.classList.add("sel");
+    g.append(btn);
+  }
+}
+function pick(d) {
+  picked = d;
+  const b = SALLE.booked[key(d)];
+  const opts = ["lunch", "dinner", "full"].filter(p => !b || (p !== "full" && p !== b));
+  $("period").innerHTML = opts.map(p => `<option value="${p}">${PERIODS[p]}</option>`).join("");
+  $("picked").textContent = `📅 ${DOW[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  $("send").disabled = false; $("err").textContent = "";
+  draw();
+  $("form").scrollIntoView({ behavior: "smooth" });
+}
+$("prev").onclick = () => { view.setMonth(view.getMonth()-1); draw(); };
+$("next").onclick = () => { view.setMonth(view.getMonth()+1); draw(); };
+draw();
+
+/* إرسال الطلب */
+$("form").onsubmit = e => {
+  e.preventDefault();
+  const name = $("name").value.trim(), phone = $("phone").value.replace(/\s/g, ""), guests = +$("guests").value;
+  if (!picked) return $("err").textContent = "اختاري التاريخ من الرزنامة.";
+  if (name.length < 3) return $("err").textContent = "اكتبي الاسم واللقب.";
+  if (!/^0[567]\d{8}$/.test(phone)) return $("err").textContent = "رقم الهاتف لازم يكون 10 أرقام ويبدا بـ 05 ولا 06 ولا 07.";
+  if (guests > SALLE.capacity) return $("err").textContent = `القاعة تشد ${SALLE.capacity} مدعو كي أكثر.`;
+  const msg = [
+    `السلام عليكم، حاب نحجز ${SALLE.name}:`,
+    `📅 التاريخ: ${$("picked").textContent.replace("📅 ", "")}`,
+    `🕐 الوقت: ${PERIODS[$("period").value]}`,
+    `🎉 المناسبة: ${$("type").value}`,
+    guests ? `👥 المدعوين: ${guests}` : "",
+    `👤 الاسم: ${name}`,
+    `📞 الهاتف: ${phone}`,
+    $("notes").value.trim() ? `📝 ${$("notes").value.trim()}` : "",
+  ].filter(Boolean).join("\n");
+  window.open(`https://wa.me/${SALLE.whatsapp}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+};
+</script>
+</body>
+</html>
